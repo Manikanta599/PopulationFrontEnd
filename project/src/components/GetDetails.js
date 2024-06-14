@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './CSS/getdetials.css';
-
+import ExportData from './ExportData';
 const GetDetails = () => {
 
   const [data, setData] = useState([]);
   const [search, setSearch] = useState('');
+  const[sheetdata,setsheetdata]=useState(null);
+  const[flag,setflag]=useState(false); //for conditional redering
 
+  const handleDownload=()=>
+    {
+      console.log(sheetdata);
+      setflag(true);
+    }
   const fetchData = () => {
     axios(`http://localhost:8090/get?q=${search}`)
       .then(response => {
         setData(response.data);
+        setsheetdata(response.data);
       })
       .catch(error => {
         console.error('Error fetching the data:', error);
@@ -26,6 +34,7 @@ const GetDetails = () => {
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase().trim();
     setSearch(value);
+    
   };
 
   function deletefun(id) {
@@ -47,6 +56,9 @@ const GetDetails = () => {
       <div id="search">
         <span>Search: </span>
         <input type='text' value={search} onChange={handleSearchChange} />
+      </div>
+      <div id="download">
+          <button onClick={handleDownload}>Download Data</button>
       </div>
       <div id="table">
         <table>
@@ -78,8 +90,11 @@ const GetDetails = () => {
           </tbody>
         </table>
       </div>
+      {flag && <ExportData data={sheetdata}/>}
     </>
   );
 };
+
+
 
 export default GetDetails;

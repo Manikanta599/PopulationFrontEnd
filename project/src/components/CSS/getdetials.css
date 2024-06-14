@@ -57,4 +57,13 @@ tbody tr:nth-of-type(even) {
       width: 200px;
   }
     
+#download button
+{
+  
+  position: absolute;
+  height: 7vh;
+  width: 12vw;
+  top:25vh;
+  right: 5vw;
+}
     

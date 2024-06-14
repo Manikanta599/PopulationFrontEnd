@@ -31,3 +31,18 @@
     top: 20vh;
     right: 25vw;
 }
+#names
+{
+    height: 50vh;
+    width: 20vw;
+    /* background-color: aqua; */
+    display: none;
+}
+
+#messag
+{
+    height: 50vh;
+    width: 20vw;
+    background-color: aqua;
+    display: none;
+}

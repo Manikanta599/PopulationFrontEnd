@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './CSS/uploadexcel.css';
 import { readExcel } from './readExcel';
 import axios from 'axios';
-import date from 'date-and-time';
- 
+
 const UploadExcel = () => {
   const [file, setFile] = useState(null);
+  const [names, setNames] = useState([]);
+  const [flag, setFlag] = useState(0);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -17,38 +18,22 @@ const UploadExcel = () => {
       readExcel(file)
         .then((data) => {
           console.log('data:', data);
-          data.forEach((values,keys) => {
-            console.log(values);
-            let date=values.dob;
-       
-            console.log("date"+date);
-            
+          data.forEach((values) => {
+            const newData = { ...values, dob: '2024/06/14' };
+            axios.post('http://localhost:8090/save', newData)
+              .then(response => {
+
+                if (response.status === 200) {
 
 
-           
+                  setFlag(1);
+                  setNames(oldNames => [...oldNames, values.name]);
 
-
-           
-
-
-            
-            axios.post('http://localhost:8090/save', values)
-    
-      .then(response => {
-        
-        if (response.status === 200) {
-          console.log("success stored data");
-          
-        } else {
-          console.log("failed..");
-          
-        }
-      })
-      .catch(error => {
-        console.log("failed..", error);
-        
-      });
-            
+                }
+              })
+              .catch(error => {
+                console.log(values.name + " failed, already present ..");
+              });
           });
         })
         .catch((error) => {
@@ -59,6 +44,15 @@ const UploadExcel = () => {
     }
   };
 
+  if(flag===1)
+    {
+      document.getElementById("names").style.display = "block"
+    }
+
+  
+   
+  
+
   return (
     <div id="excel_con">
       <h3 id="fileh">Here you can Upload Your Excel File:</h3>
@@ -67,6 +61,19 @@ const UploadExcel = () => {
       </div>
       <div id="files">
         <button onClick={handleSubmit}>Submit</button>
+      </div>
+
+      <div id="messag">
+        Data already present
+      </div>
+
+      <div id="names">
+        <h4>Stored Names:</h4>
+        <ul>
+          {names.map((name, index) => (
+            <li key={index}>{name}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );
