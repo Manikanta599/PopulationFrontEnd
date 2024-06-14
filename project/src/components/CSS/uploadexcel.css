@@ -1,0 +1,33 @@
+#excel_con
+{
+    background-color: azure;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#file
+{
+    /* background-color: aqua; */
+    position: relative;
+    top:-10%;
+}
+
+#fileh
+{
+    
+    position: relative;
+    top:-20%;
+    left: 0vw;
+}
+
+#files button
+{
+    position: relative;
+    top: 20vh;
+    right: 25vw;
+}
