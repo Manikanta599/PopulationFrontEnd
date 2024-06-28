@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './CSS/uploadexcel.css';
-import { readExcel } from './readExcel';
+import { readExcel } from './readExcel'; 
 import axios from 'axios';
 
 const UploadExcel = () => {
   const [file, setFile] = useState(null);
   const [names, setNames] = useState([]);
   const [flag, setFlag] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -17,41 +18,46 @@ const UploadExcel = () => {
     if (file) {
       readExcel(file)
         .then((data) => {
-          console.log('data:', data);
-          data.forEach((values) => {
-            const newData = { ...values, dob: '2024/06/14' };
-            axios.post('http://localhost:8090/save', newData)
-              .then(response => {
+          console.log('Data read from Excel:', data);
 
-                if (response.status === 200) {
+          const updatedData = data.map(values => ({
+            ...values,
+            dob: '2024/06/14'
+          }));
 
+          axios.post('http://localhost:8090/save', updatedData)
+            .then(response => {
+              console.log('Response from backend:', response);
+              if (response.status === 200 && Array.isArray(response.data.names)) {
+                console.log('Names received from backend:', response.data.names);
+                setNames(response.data.names);  // Set the names state
+                setFlag(1);  // Set the flag state
+              } else {
+                // Backend response is not as expected
+                setErrorMessage('No new names were saved.');
+                setFlag(0);  // Reset flag state
+              }
 
-                  setFlag(1);
-                  setNames(oldNames => [...oldNames, values.name]);
-
-                }
-              })
-              .catch(error => {
-                console.log(values.name + " failed, already present ..");
-              });
-          });
+              // Log the names after setting the state
+              console.log("Updated names: ", response.data.names);
+            })
+            .catch(error => {
+              console.error('Error saving data:', error);
+              setErrorMessage('Data already present.');
+              setFlag(0);  // Reset flag state
+            });
         })
         .catch((error) => {
           console.error('Error reading excel file:', error);
+          setErrorMessage('Error reading excel file. Please try again.');
+          setFlag(0);  // Reset flag state
         });
     } else {
       console.error('No file selected');
+      setErrorMessage('No file selected. Please select a file.');
+      setFlag(0);  // Reset flag state
     }
   };
-
-  if(flag===1)
-    {
-      document.getElementById("names").style.display = "block"
-    }
-
-  
-   
-  
 
   return (
     <div id="excel_con">
@@ -63,18 +69,23 @@ const UploadExcel = () => {
         <button onClick={handleSubmit}>Submit</button>
       </div>
 
-      <div id="messag">
-        Data already present
-      </div>
+      {names.length > 0 && (
+        <div id="names">
+          <h4>Stored Names:</h4>
+          <ul>
+            {names.map((name, index) => (
+              <li key={index}>{name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      <div id="names">
-        <h4>Stored Names:</h4>
-        <ul>
-          {names.map((name, index) => (
-            <li key={index}>{name}</li>
-          ))}
-        </ul>
-      </div>
+      {errorMessage && (
+        <div id="errorMessage">
+          {errorMessage}
+        </div>
+      )}
+
     </div>
   );
 };

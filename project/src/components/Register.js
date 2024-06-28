@@ -20,7 +20,7 @@ function Rform() {
 
   const changeHandler = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
-    console.log("from form "+data)
+    console.log("from form ",{data})
   };
 
   const submitHandler = (e) => {

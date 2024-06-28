@@ -2,23 +2,25 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './CSS/getdetials.css';
 import ExportData from './ExportData';
-const GetDetails = () => {
 
+const GetDetails = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState('');
-  const[sheetdata,setsheetdata]=useState(null);
-  const[flag,setflag]=useState(false); //for conditional redering
+  const [sheetdata, setSheetdata] = useState(null);
+  const [flag, setFlag] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // Change this value to the desired number of items per page
 
-  const handleDownload=()=>
-    {
-      console.log(sheetdata);
-      setflag(true);
-    }
+  const handleDownload = () => {
+    console.log(sheetdata);
+    setFlag(true);
+  }
+
   const fetchData = () => {
     axios(`http://localhost:8090/get?q=${search}`)
       .then(response => {
         setData(response.data);
-        setsheetdata(response.data);
+        setSheetdata(response.data);
       })
       .catch(error => {
         console.error('Error fetching the data:', error);
@@ -26,28 +28,39 @@ const GetDetails = () => {
   };
 
   useEffect(() => {
-    
     fetchData();
-
   }, [search]);
 
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase().trim();
     setSearch(value);
-    
   };
 
-  function deletefun(id) {
+  const deletefun = (id) => {
     console.log(id);
     axios.delete('http://localhost:8090/delete', { data: { id: id } })
-        .then(res => {
-            console.log('Deleted successfully', res.data);
-            // Fetch the updated data after deletion
-            fetchData();
-        })
-        .catch(error => {
-            console.error('Error deleting', error);
-        });
+      .then(res => {
+        console.log('Deleted successfully', res.data);
+        fetchData(); // Fetch the updated data after deletion
+      })
+      .catch(error => {
+        console.error('Error deleting', error);
+      });
+  };
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Logic for displaying current page data
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Logic for displaying page numbers
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(data.length / itemsPerPage); i++) {
+    pageNumbers.push(i);
   }
 
   return (
@@ -58,7 +71,7 @@ const GetDetails = () => {
         <input type='text' value={search} onChange={handleSearchChange} />
       </div>
       <div id="download">
-          <button onClick={handleDownload}>Download Data</button>
+        <button onClick={handleDownload}>Download Data</button>
       </div>
       <div id="table">
         <table>
@@ -75,7 +88,7 @@ const GetDetails = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((item, index) => (
+            {currentItems.map((item, index) => (
               <tr key={index}>
                 <td>{item.name}</td>
                 <td>{item.village}</td>
@@ -90,11 +103,16 @@ const GetDetails = () => {
           </tbody>
         </table>
       </div>
-      {flag && <ExportData data={sheetdata}/>}
+      <div id="pagination">
+        {pageNumbers.map(number => (
+          <button key={number} onClick={() => handlePageChange(number)} disabled={number === currentPage}>
+            {number}
+          </button>
+        ))}
+      </div>
+      {flag && <ExportData data={sheetdata} />}
     </>
   );
 };
-
-
 
 export default GetDetails;

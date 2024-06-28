@@ -36,7 +36,9 @@
     height: 50vh;
     width: 20vw;
     /* background-color: aqua; */
-    display: none;
+    background-color: blue;
+    /* position: absolute; */
+    
 }
 
 #messag

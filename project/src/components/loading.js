@@ -4,16 +4,15 @@ import axios from 'axios';
 export const Loading = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
+  useEffect(() => { 
 
     axios.interceptors.request.use(request => {
       setIsLoading(true);
       return request;
-      
     },
     error => {
       setIsLoading(false);
-      return Promise.reject(error);
+      return Promise.reject(error); 
     });
 
     
