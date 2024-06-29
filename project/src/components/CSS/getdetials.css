@@ -5,6 +5,7 @@
       width: 100vw;
       display: flex;
       justify-content: center;
+      margin-bottom: 40px;
       
   }
   table {
@@ -48,8 +49,6 @@ tbody tr:nth-of-type(even) {
       position: absolute;
       top: 30vh;
       left: 30vw;
-      
-
     }
 
     #search input {
@@ -66,4 +65,19 @@ tbody tr:nth-of-type(even) {
   top:25vh;
   right: 5vw;
 }
-    
+
+#pagination {
+  display: flex;
+  justify-content: center; /* Center the pagination controls */
+  margin-top: 80vh;                  /* Add space above the pagination controls */
+}
+
+#pagination button {
+  margin: 0 5px; /* Space between pagination buttons */
+ 
+}
+
+label
+{
+  font-weight: bold;
+}

@@ -9,12 +9,12 @@ const GetDetails = () => {
   const [sheetdata, setSheetdata] = useState(null);
   const [flag, setFlag] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Change this value to the desired number of items per page
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const handleDownload = () => {
     console.log(sheetdata);
     setFlag(true);
-  }
+  };
 
   const fetchData = () => {
     axios(`http://localhost:8090/get?q=${search}`)
@@ -50,6 +50,11 @@ const GetDetails = () => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(parseInt(e.target.value));
+    setCurrentPage(1); // Reset to the first page when items per page changes
   };
 
   // Logic for displaying current page data
@@ -104,11 +109,24 @@ const GetDetails = () => {
         </table>
       </div>
       <div id="pagination">
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+          Prev
+        </button>
         {pageNumbers.map(number => (
           <button key={number} onClick={() => handlePageChange(number)} disabled={number === currentPage}>
             {number}
           </button>
         ))}
+        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === pageNumbers.length}>
+          Next
+        </button>
+        <label>Per Page</label>
+        <select id="itemsPerPage" value={itemsPerPage} onChange={handleItemsPerPageChange}>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={15}>15</option>
+          <option value={20}>20</option>
+        </select>
       </div>
       {flag && <ExportData data={sheetdata} />}
     </>
